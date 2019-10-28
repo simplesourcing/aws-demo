@@ -1,7 +1,32 @@
-# aws-demo
-Demo application using AWS
+# Simplesourcing aws-demo
+Demo application using Simplesourcing deployed on AWS using Elasticseaarch, Fargate and MSK.
 
-Detailed AWS deployment instructions
+## Project prerequisites
+* JDK 11
+* Gradle
+
+If you are a [nix](https://nixos.org/nix/) user you can use the provided [shell.nix](shell.nix) file with `nix-shell`.
+
+## Building
+To build the application:
+
+```
+gradle bootJar
+```
+
+To package the application as a Docker container:
+
+```
+gradle createDockerfile
+```
+
+Followed by:
+```
+docker build -f build/docker/Dockerfile -t simplesource-demo .
+```
+
+
+# Detailed AWS deployment instructions
 
 ## Fargate app deployment
 

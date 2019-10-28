@@ -28,8 +28,8 @@ public class AccountSummaryProjection implements Indexer {
 
     @Override
     public void index(String key, ValueWithSequence<AccountEvent> value) {
-        value.value().match(
-                accountCreated -> {
+        value.value().<Runnable>match(
+                accountCreated -> () -> {
                     try {
                         Map<String, Object> data = new HashMap<>();
                         data.put("accountName", accountCreated.accountName);
@@ -46,11 +46,8 @@ public class AccountSummaryProjection implements Indexer {
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
-
-                    return null;
                 },
-                deposited -> {
-                    log.info("*****************{}**************", deposited.amount);
+                deposited -> () -> {
                     try {
                         // 1) Get current doc
                         GetRequest getRequest = new GetRequest(INDEX, key);
@@ -81,9 +78,8 @@ public class AccountSummaryProjection implements Indexer {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                    return null;
                 },
-                withdrawn -> {
+                withdrawn -> () -> {
                     try {
                         // 1) Get current doc
                         GetRequest getRequest = new GetRequest(INDEX, key).version(value.sequence().getSeq() - 1);
@@ -115,8 +111,8 @@ public class AccountSummaryProjection implements Indexer {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                    return null;
                 }
-        );
+        )
+        .run();
     }
 }

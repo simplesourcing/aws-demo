@@ -27,11 +27,9 @@ public class IndexController {
 
     @GetMapping("/")
     public ModelAndView index() {
-        if(!healthcheckService.isHealthy()) {
-            throw new UnhealthyException();
-        }
-
-        List<AccountListRow> items = accountService.list().stream().map(a -> new AccountListRow(a.accountName, a.balance)).collect(Collectors.toList());
+        List<AccountListRow> items = accountService.list()
+                .stream()
+                .map(a -> new AccountListRow(a.accountName, a.balance)).collect(Collectors.toList());
 
         return new ModelAndView("index", Collections.singletonMap("accounts", items));
     }

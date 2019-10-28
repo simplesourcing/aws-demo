@@ -1,6 +1,5 @@
 package io.simplesource.example.demo.web.controller;
 
-import io.simplesource.example.demo.domain.AccountTransaction;
 import io.simplesource.example.demo.service.AccountService;
 import io.simplesource.example.demo.web.form.CreateAccountForm;
 import io.simplesource.example.demo.web.form.DepositForm;

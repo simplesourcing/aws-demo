@@ -64,5 +64,4 @@ task createDockerfile(type: Dockerfile) {
   copyFile "build/libs/aws-demo.jar", '/opt/microservice.jar'
   entryPoint 'java'
   defaultCommand '-jar', '/opt/microservice.jar'
-  exposePort 8083
 }

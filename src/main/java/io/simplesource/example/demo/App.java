@@ -6,7 +6,6 @@ import io.simplesource.example.demo.repository.read.AccountReadElasticSearchRepo
 import io.simplesource.example.demo.repository.read.AccountReadRepository;
 import io.simplesource.example.demo.repository.write.AccountWriteRepository;
 import io.simplesource.example.demo.repository.write.simplesource.*;
-import io.simplesource.example.demo.repository.write.simplesource.wire.AccountId;
 import io.simplesource.example.demo.service.AccountService;
 import io.simplesource.example.demo.service.DefaultAccountService;
 import io.simplesource.kafka.api.AggregateSerdes;
@@ -23,11 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 
 import javax.annotation.PostConstruct;
@@ -55,7 +50,7 @@ public class App implements WebMvcConfigurer {
                     jsonDomainMapper(),
                     jsonOptionalDomainMapper());
 
-    public static final CommandSerdes<AccountId, AccountCommand> ACCOUNT_COMMAND_SERDES =
+    public static final CommandSerdes<String, AccountCommand> ACCOUNT_COMMAND_SERDES =
             new JsonCommandSerdes<>(jsonDomainMapper(), jsonDomainMapper());
 
     public static void main(String[] args) {
@@ -120,7 +115,7 @@ public class App implements WebMvcConfigurer {
                                 .withKafkaBootstrap(config.kafkaBootstrapServers)
                                 .build()
                 )
-                .<AccountId, AccountCommand>addCommands(builder ->
+                .<String, AccountCommand>addCommands(builder ->
                         builder
                                 .withClientId(config.kafkaGropId)
                                 .withCommandResponseRetention(3600L)

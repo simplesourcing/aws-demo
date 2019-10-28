@@ -1,6 +1,14 @@
 # Simplesourcing aws-demo
 Demo application using Simplesourcing deployed on AWS using Elasticseaarch, Fargate and MSK.
 
+This demo app shows a basic account application with the below commands:
+* CreateAccount
+* Deposit
+* Withdraw
+
+Simplesourcing and Kafka are used for a distributed [log](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying). [Elasticsearch](https://www.elastic.co/) is used as the read-store for this demo application.
+
+
 ## Project prerequisites
 * JDK 11
 * Gradle

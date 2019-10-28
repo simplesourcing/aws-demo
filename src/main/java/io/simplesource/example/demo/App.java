@@ -97,7 +97,7 @@ public class App implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/templates/");
+        templateResolver.setPrefix("templates/");
         templateResolver.setSuffix(".html");
         return templateResolver;
     }

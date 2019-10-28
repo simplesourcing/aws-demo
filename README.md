@@ -33,6 +33,36 @@ Followed by:
 docker build -f build/docker/Dockerfile -t simplesource-demo .
 ```
 
+## Running locally
+Use the provided [docker-compose.yml](docker-compose.yml) file to start Elasticsearch and Kafka locally.
+
+Modify your hosts file adding the below:
+
+```
+127.0.0.1 broker kafka elasticsearch
+```
+
+Start docker-compose:
+
+```
+docker-compose up
+```
+
+Export the below environment variables:
+
+```
+export SERVER_PORT=8083
+export KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+export ELASTICSEARCH_HOST=elasticsearch
+export ELASTICSEARCH_PORT=9200
+```
+
+Start the app:
+```
+gradle run
+```
+
+Open a web browser and go to [http://localhost:8083](http://localhost:8083).
 
 # Detailed AWS deployment instructions
 

@@ -6,28 +6,25 @@ import io.simplesource.api.CommandId;
 import io.simplesource.data.FutureResult;
 import io.simplesource.data.Result;
 import io.simplesource.data.Sequence;
-import io.simplesource.example.demo.domain.Account;
 import io.simplesource.example.demo.repository.write.AccountWriteRepository;
 import io.simplesource.example.demo.repository.write.CreateAccountError;
-import io.simplesource.kafka.model.CommandRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 
 /**
  * Use Simplesourcing as the write store
  */
-public class SimplesourceAccountRepository implements AccountWriteRepository {
+public class SimplesourceAccountWriteRepository implements AccountWriteRepository {
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
-    private static final Logger log = LoggerFactory.getLogger(SimplesourceAccountRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(SimplesourceAccountWriteRepository.class);
 
     private CommandAPI<String, AccountCommand> commandApi;
 
-    public SimplesourceAccountRepository(@Autowired CommandAPI<String, AccountCommand> commandApi){
+    public SimplesourceAccountWriteRepository(@Autowired CommandAPI<String, AccountCommand> commandApi){
         this.commandApi = commandApi;
     }
 

@@ -138,7 +138,7 @@ public class App implements WebMvcConfigurer {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public AccountWriteRepository accountWriteRepository(CommandAPISet commandAPISet) {
-        return new SimplesourceAccountRepository(commandAPISet.getCommandAPI("account"));
+        return new SimplesourceAccountWriteRepository(commandAPISet.getCommandAPI("account"));
     }
 
 

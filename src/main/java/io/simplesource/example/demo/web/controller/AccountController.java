@@ -29,7 +29,7 @@ public class AccountController {
     //
     @GetMapping("/account/create")
     public ModelAndView viewCreateAccountPage() {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
         model.put("form", CreateAccountForm.EMPTY);
         model.put("errors", new String[] {});
         return new ModelAndView("account_create", model);
@@ -41,7 +41,7 @@ public class AccountController {
     public ModelAndView handleCreateFormSubmit(@ModelAttribute CreateAccountForm form) {
         return accountService.createAccount(form.getAccountName(), form.getAccountBalance())
             .map(error -> {
-                Map model = new HashMap();
+                Map<String, Object> model = new HashMap<>();
                 model.put("form", form);
                 model.put("errors", new String[] { error.message() });
                 return new ModelAndView("account_create", model);
@@ -62,7 +62,7 @@ public class AccountController {
     //
     @GetMapping("/account/deposit/{account}")
     public ModelAndView viewDepositAccountPage(@PathVariable String account) {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
 
         // Note accountSummary is eventually consistent so depending on end-to-end delay of projection
         // generation this may cause optimistic concurrency exceptions from simple sourcing.
@@ -87,7 +87,7 @@ public class AccountController {
 
     @PostMapping("/account/deposit/{account}")
     public ModelAndView handleDepositSubmit(@ModelAttribute DepositForm form, @PathVariable("account") String account) {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
 
         // TODO we shouldn't have this logic here, accountService.withdraw should tell us account doesn't exist
         if (!accountService.accountExists(account)) {
@@ -107,7 +107,7 @@ public class AccountController {
     //
     @GetMapping("/account/withdraw/{account}")
     public ModelAndView viewWithdrawAccountPage(@PathVariable String account) {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
 
         // Note accountSummary is eventually consistent so depending on end-to-end delay of projection
         // generation this may cause optimistic concurrency exceptions from simple sourcing.
@@ -132,7 +132,7 @@ public class AccountController {
 
     @PostMapping("/account/withdraw/{account}")
     public ModelAndView handleWithdawSubmit(@ModelAttribute WithdrawForm form, @PathVariable("account") String account) {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
 
         // TODO we shouldn't have this logic here, accountService.withdraw should tell us account doesn't exist
         if (!accountService.accountExists(account)) {
@@ -153,7 +153,7 @@ public class AccountController {
     @GetMapping("/account/{account}/transactions")
     @ResponseBody
     public ModelAndView viewTransactions(@PathVariable("account") String account) {
-        Map model = new HashMap();
+        Map<String, Object> model = new HashMap<>();
 
         List<AccountTransactionRow> transactions = accountService
                 .getTransactions(account)

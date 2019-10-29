@@ -13,14 +13,11 @@ buildscript {
 
 plugins {
   id 'com.bmuschko.docker-remote-api' version '3.2.3'
+  id 'application'
+  id 'java'
+  id 'org.springframework.boot' version "2.1.9.RELEASE"
+  id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 }
-
-apply plugin: 'application'
-apply plugin: 'java'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: "com.commercehub.gradle.plugin.avro"
-
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -35,25 +32,27 @@ application {
   mainClassName 'io.simplesource.example.demo.App'
 }
 
-repositories {
-  mavenCentral()
-}
+def versions = [
+  elasticsearch: "7.4.0",
+  spring:"2.1.9.RELEASE",
+  simplesource:"0.2.7"
+]
 
 dependencies {
-  compile('org.springframework.boot:spring-boot-starter-web:2.1.9.RELEASE')
-  compile('org.springframework.boot:spring-boot-starter-thymeleaf:2.1.9.RELEASE')
+  compile("org.springframework.boot:spring-boot-starter-web:${versions.spring}")
+  compile("org.springframework.boot:spring-boot-starter-thymeleaf:${versions.spring}")
   compile('org.webjars:bootstrap:4.3.1')
 
-  compile('io.simplesource:simplesource-command-api:0.2.7')
-  compile('io.simplesource:simplesource-command-kafka:0.2.7')
-  compile('io.simplesource:simplesource-command-serialization:0.2.7')
+  compile("io.simplesource:simplesource-command-api:${versions.simplesource}")
+  compile("io.simplesource:simplesource-command-kafka:${versions.simplesource}")
+  compile("io.simplesource:simplesource-command-serialization:${versions.simplesource}")
 
   compile 'org.apache.avro:avro:1.9.1'
   compile('org.apache.kafka:kafka-clients:2.3.0')
 
-  compile('org.elasticsearch.client:elasticsearch-rest-high-level-client:7.4.0')
-  compile('org.elasticsearch.client:elasticsearch-rest-client:7.4.0')
-  compile('org.elasticsearch:elasticsearch:7.4.0')
+  compile("org.elasticsearch.client:elasticsearch-rest-high-level-client:${versions.elasticsearch}")
+  compile("org.elasticsearch.client:elasticsearch-rest-client:${versions.elasticsearch}")
+  compile("org.elasticsearch:elasticsearch:${versions.elasticsearch}")
 }
 
 

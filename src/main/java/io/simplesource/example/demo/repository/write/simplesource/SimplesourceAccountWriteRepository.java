@@ -8,6 +8,7 @@ import io.simplesource.data.Result;
 import io.simplesource.data.Sequence;
 import io.simplesource.example.demo.repository.write.AccountWriteRepository;
 import io.simplesource.example.demo.repository.write.CreateAccountError;
+import io.simplesource.example.demo.repository.write.DepositError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,22 +55,26 @@ public class SimplesourceAccountWriteRepository implements AccountWriteRepositor
     }
 
     @Override
-    public void deposit(String account, double amount, Sequence version) {
+    public Optional<DepositError> deposit(String account, double amount, Sequence version) {
         FutureResult<CommandError, Sequence> result = commandApi.publishAndQueryCommand(new CommandAPI.Request<>(CommandId.random(), account, version, new AccountCommand.Deposit(amount)), DEFAULT_TIMEOUT);
 
-        Result<CommandError, Sequence> commandErrorSequenceResult = result.unsafePerform(e -> CommandError.of(CommandError.Reason.InternalError, e.getMessage()));
+        Result<CommandError, Sequence> resolved = result.unsafePerform(e -> CommandError.of(CommandError.Reason.InternalError, e.getMessage()));
 
-        commandErrorSequenceResult.failureReasons()
-                .map( errors -> (Runnable) () -> {
-                    log.info("Failed depositing {} in account {} with seq {}", amount, account, version);
-                    errors.forEach(error -> {
-                        log.error("  - {}", error.getMessage());
-                    });
-                    throw new RuntimeException("Deposit failed"); // TODO should return a value
-                })
-                .orElse(() -> {})
-                .run();
+        Optional<CommandError> commandError = resolved.failureReasons().flatMap(l -> Optional.of(l.head()));
 
+        return commandError.<DepositError>flatMap(e -> {
+            // TODO should be a better way to get AggregateNotFound without the and matching strings below
+            if(e.getReason() == CommandError.Reason.AggregateNotFound) {
+                return Optional.of(DepositError.ACCOUNT_NOT_FOUND);
+            }
+
+            if(e.getReason() == CommandError.Reason.InvalidReadSequence && e.getMessage().startsWith("Command received with read sequence") && e.getMessage().endsWith("expecting 0")) {
+                return Optional.of(DepositError.ACCOUNT_NOT_FOUND);
+            }
+
+            // TODO shouldn't be throwing exceptions here
+            return Optional.of(DepositError.fromString(e.getMessage()).orElseThrow(() -> new RuntimeException(e.getReason() + ": " + e.getMessage())));
+        });
     }
 
     @Override

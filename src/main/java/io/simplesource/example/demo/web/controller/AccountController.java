@@ -87,19 +87,15 @@ public class AccountController {
 
     @PostMapping("/account/deposit/{account}")
     public ModelAndView handleDepositSubmit(@ModelAttribute DepositForm form, @PathVariable("account") String account) {
-        Map<String, Object> model = new HashMap<>();
-
-        // TODO we shouldn't have this logic here, accountService.withdraw should tell us account doesn't exist
-        if (!accountService.accountExists(account)) {
-            model.put("form", form);
-            model.put("account", account);
-            model.put("errors", new String[] { "Account does not exist"});
-            return new ModelAndView("account_deposit", model);
-        }
-
-        accountService.deposit(account, form.getAmount(), form.getSequence());
-
-        return new ModelAndView("redirect:/account/deposit/success", Collections.emptyMap());
+        return accountService.deposit(account, form.getAmount(), form.getSequence())
+                .map(e -> {
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("form", form);
+                    model.put("account", account);
+                    model.put("errors", new String[] { e.message() });
+                    return new ModelAndView("account_deposit", model);
+                })
+                .orElseGet(() -> new ModelAndView("redirect:/account/deposit/success", Collections.emptyMap()));
     }
 
     //

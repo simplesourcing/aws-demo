@@ -111,13 +111,13 @@ public class App implements WebMvcConfigurer {
         CommandAPISet result = new EventSourcedClient()
                 .withKafkaConfig(builder ->
                         builder
-                                .withKafkaApplicationId(config.kafkaGropId)
+                                .withKafkaApplicationId(config.kafkaGroupId)
                                 .withKafkaBootstrap(config.kafkaBootstrapServers)
                                 .build()
                 )
                 .<String, AccountCommand>addCommands(builder ->
                         builder
-                                .withClientId(config.kafkaGropId)
+                                .withClientId(config.kafkaGroupId)
                                 .withCommandResponseRetention(3600L)
                                 .withName("account")
                                 .withSerdes(ACCOUNT_COMMAND_SERDES)

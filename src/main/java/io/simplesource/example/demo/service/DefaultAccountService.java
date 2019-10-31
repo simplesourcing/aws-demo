@@ -6,6 +6,8 @@ import io.simplesource.example.demo.domain.AccountTransaction;
 import io.simplesource.example.demo.repository.read.AccountReadRepository;
 import io.simplesource.example.demo.repository.write.AccountWriteRepository;
 import io.simplesource.example.demo.repository.write.CreateAccountError;
+import io.simplesource.example.demo.repository.write.DepositError;
+import io.simplesource.example.demo.repository.write.WithdrawError;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,13 +44,13 @@ public class DefaultAccountService implements AccountService {
     }
 
     @Override
-    public void deposit(String account, double amount, long sequence) {
-        accountWriteRepository.deposit(account, amount, Sequence.position(sequence));
+    public Optional<DepositError> deposit(String account, double amount, long sequence) {
+        return accountWriteRepository.deposit(account, amount, Sequence.position(sequence));
     }
 
     @Override
-    public void withdraw(String account, double amount, long sequence) {
-        accountWriteRepository.withdraw(account, amount, Sequence.position(sequence));
+    public Optional<WithdrawError> withdraw(String account, double amount, long sequence) {
+        return accountWriteRepository.withdraw(account, amount, Sequence.position(sequence));
     }
 
     @Override

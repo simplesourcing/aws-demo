@@ -37,35 +37,6 @@ services:
       KAFKA_JMX_OPTS: '-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=broker -Djava.net.preferIPv4Stack=true -Dcom.sun.management.jmxremote.rmi.port=8500'
 
 
-  # This "container" is a workaround to pre-create topics for the Kafka Auction example application
-  # until we have a more elegant way to do that.
-  kafka-create-topics:
-    image: confluentinc/cp-kafka:5.0.0
-    depends_on:
-    - broker
-    - zookeeper
-    hostname: kafka-create-topics
-    # We defined a dependency on "broker", but `depends_on` will NOT wait for the
-    # dependencies to be "ready" before starting the "kafka-create-topics"
-    # container;  it waits only until the dependencies have started.  Hence we
-    # must control startup order more explicitly.
-    # See https://docs.docker.com/compose/startup-order/
-    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-                       cub zk-ready zookeeper:2181 120 && \
-                       cub kafka-ready -b broker:9092 1 120 && \
-                       kafka-topics --create --topic auction_account_transactions_projection --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 && \
-                       kafka-topics --create --topic auction_avro_auction-aggregate --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 && \
-                       kafka-topics --create --topic auction_avro_account-aggregate --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 && \
-                       sleep infinity'"
-    environment:
-      # The following settings are listed here only to satisfy the image's requirements.
-      # We override the image's `command` anyways, hence this container will not start a broker.
-      KAFKA_BROKER_ID: ignored
-      KAFKA_ZOOKEEPER_CONNECT: ignored
-    extra_hosts:
-      - "moby:127.0.0.1"
-
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
     restart: always

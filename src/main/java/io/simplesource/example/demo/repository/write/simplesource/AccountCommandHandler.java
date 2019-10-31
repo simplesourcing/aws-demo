@@ -5,6 +5,8 @@ import io.simplesource.api.CommandHandler;
 import io.simplesource.data.NonEmptyList;
 import io.simplesource.data.Result;
 import io.simplesource.example.demo.repository.write.CreateAccountError;
+import io.simplesource.example.demo.repository.write.DepositError;
+import io.simplesource.example.demo.repository.write.WithdrawError;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -47,12 +49,12 @@ public final class AccountCommandHandler implements CommandHandler<String, Accou
         return currentAggregate
                 .<Result<CommandError, NonEmptyList<AccountEvent>>>map(account -> {
                     if (command.amount <= 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Amount must be greater than 0"));
+                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, DepositError.DEPOSIT_NEGATIVE_NUMBER.message()));
                     } else {
                         return Result.success(NonEmptyList.of(new AccountEvent.Deposited(command.amount, Instant.now())));
                     }
                 })
-                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Account does not exist")));
+                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, DepositError.ACCOUNT_NOT_FOUND.message())));
     }
 
     public static Result<CommandError, NonEmptyList<AccountEvent>> withdrawHandler(Optional<Account> currentAggregate, AccountCommand.Withdraw command) {
@@ -61,11 +63,11 @@ public final class AccountCommandHandler implements CommandHandler<String, Accou
                     if (command.amount <= 0) {
                         return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Amount must be greater than 0"));
                     } else if (account.balance() - command.amount < 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Insufficient funds"));
+                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, WithdrawError.INSUFFICIENT_FUNDS.message()));
                     } else {
                         return Result.success(NonEmptyList.of(new AccountEvent.Withdrawn(command.amount, Instant.now())));
                     }
                 })
-                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Account does not exist")));
+                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, WithdrawError.ACCOUNT_NOT_FOUND.message())));
     }
 }

@@ -7,10 +7,10 @@ with import (builtins.fetchTarball {
 }) {
   config = {
     packageOverrides = pkgs: with pkgs; {
-      # Set default jre to Java 12
-      java = pkgs.jdk12;
-      jdk  = pkgs.jdk12;
-      jre  = pkgs.jdk12;
+      # Set default jre to Java 11
+      java = jdk11;
+      jdk  = jdk11;
+      jre  = jdk11;
     };
   };
 };

@@ -9,5 +9,5 @@ public interface AccountWriteRepository {
 
     Optional<DepositError> deposit(String account, double amount, Sequence version);
 
-    void withdraw(String account, double amount, Sequence position);
+    Optional<WithdrawError> withdraw(String account, double amount, Sequence position);
 }

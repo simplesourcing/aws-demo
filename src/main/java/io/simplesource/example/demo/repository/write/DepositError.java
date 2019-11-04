@@ -29,7 +29,7 @@ public abstract class DepositError {
 
         @Override
         public String message() {
-            return "Account does not found";
+            return "Account not found";
         }
     }
 

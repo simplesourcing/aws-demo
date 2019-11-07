@@ -23,6 +23,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
+  mavenLocal()
   mavenCentral()
   maven { url 'https://packages.confluent.io/maven/' }
   jcenter()
@@ -35,7 +36,7 @@ application {
 def versions = [
   elasticsearch: "7.4.0",
   spring:"2.1.9.RELEASE",
-  simplesource:"0.2.7"
+  simplesource:"0.2.8-SNAPSHOT"
 ]
 
 dependencies {

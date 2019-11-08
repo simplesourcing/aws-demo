@@ -24,7 +24,7 @@ public class SimplesourceAccountWriteRepository implements AccountWriteRepositor
 
     private CommandAPI<String, AccountCommand> commandApi;
 
-    public SimplesourceAccountWriteRepository(@Autowired CommandAPI<String, AccountCommand> commandApi){
+    public SimplesourceAccountWriteRepository(@Autowired CommandAPI<String, AccountCommand> commandApi) {
         this.commandApi = commandApi;
     }
 
@@ -32,21 +32,19 @@ public class SimplesourceAccountWriteRepository implements AccountWriteRepositor
     public Optional<CreateAccountError> create(String accountName, double openingBalance) {
         FutureResult<CommandError, Sequence> result = commandApi.publishAndQueryCommand(new CommandAPI.Request<>(CommandId.random(), accountName, Sequence.first(), new AccountCommand.CreateAccount(accountName, openingBalance)), DEFAULT_TIMEOUT);
 
-       //TODO handle future resolution and error handling properly, below is a quick hacky just do it implementation
-        final Result<CommandError, Sequence> resolved = result.unsafePerform(e -> CommandError.of(CommandError.Reason.CommandHandlerFailed, e.getMessage()));
+        //TODO handle future resolution and error handling properly, below is a quick hacky just do it implementation
+        final Result<CommandError, Sequence> resolved = result.unsafePerform(CommandError.CommandHandlerFailed::new);
 
 
-        if(resolved.failureReasons().isPresent()){
-            if(resolved.failureReasons().get().head().getReason() == CommandError.Reason.InvalidReadSequence) {
-                return Optional.of(CreateAccountError.ACCOUNT_ALREADY_EXISTS);
-            }
+        if (resolved.failureReasons().isPresent()) {
+            CommandError head = resolved.failureReasons().get().head();
 
-            Optional<CreateAccountError> error = CreateAccountError.fromString(resolved.failureReasons().get().head().getMessage());
-
-            if(error.isPresent()) {
-                return error;
+            if (head instanceof CommandError.InvalidReadSequence) {
+                return Optional.of(new CreateAccountError.AccountAlreadyExists());
+            } else if (head instanceof CreateAccountError) {
+                return Optional.of((CreateAccountError) head);
             } else {
-                throw new RuntimeException(resolved.failureReasons().get().head().getMessage());
+                throw head;
             }
         }
 
@@ -57,10 +55,10 @@ public class SimplesourceAccountWriteRepository implements AccountWriteRepositor
     public void deposit(String account, double amount, Sequence version) {
         FutureResult<CommandError, Sequence> result = commandApi.publishAndQueryCommand(new CommandAPI.Request<>(CommandId.random(), account, version, new AccountCommand.Deposit(amount)), DEFAULT_TIMEOUT);
 
-        Result<CommandError, Sequence> commandErrorSequenceResult = result.unsafePerform(e -> CommandError.of(CommandError.Reason.InternalError, e.getMessage()));
+        Result<CommandError, Sequence> commandErrorSequenceResult = result.unsafePerform(CommandError.InternalError::new);
 
         commandErrorSequenceResult.failureReasons()
-                .map( errors -> (Runnable) () -> {
+                .map(errors -> (Runnable) () -> {
                     log.info("Failed depositing {} in account {} with seq {}", amount, account, version);
                     errors.forEach(error -> {
                         log.error("  - {}", error.getMessage());
@@ -76,10 +74,10 @@ public class SimplesourceAccountWriteRepository implements AccountWriteRepositor
     public void withdraw(String account, double amount, Sequence position) {
         FutureResult<CommandError, Sequence> result = commandApi.publishAndQueryCommand(new CommandAPI.Request<>(CommandId.random(), account, position, new AccountCommand.Withdraw(amount)), DEFAULT_TIMEOUT);
 
-        Result<CommandError, Sequence> commandErrorSequenceResult = result.unsafePerform(e -> CommandError.of(CommandError.Reason.InternalError, e.getMessage()));
+        Result<CommandError, Sequence> commandErrorSequenceResult = result.unsafePerform(CommandError.InternalError::new);
 
         commandErrorSequenceResult.failureReasons()
-                .map( errors -> (Runnable) () -> {
+                .map(errors -> (Runnable) () -> {
                     log.info("Failed depositing {} in account {} with seq {}", amount, account, position.getSeq());
                     errors.forEach(error -> {
                         log.error("  - {}", error.getMessage());

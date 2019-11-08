@@ -13,11 +13,11 @@ public final class AccountCommandHandler implements CommandHandler<String, Accou
     private static AccountCommandHandler instance = null;
 
     public static AccountCommandHandler getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new AccountCommandHandler();
         }
 
-        return  instance;
+        return instance;
     }
 
     @Override
@@ -31,12 +31,12 @@ public final class AccountCommandHandler implements CommandHandler<String, Accou
 
     public static Result<CommandError, NonEmptyList<AccountEvent>> createAccountHandler(Optional<Account> currentAggregate, AccountCommand.CreateAccount command) {
         return currentAggregate
-                .<Result<CommandError, NonEmptyList<AccountEvent>>>map(account -> Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, CreateAccountError.ACCOUNT_ALREADY_EXISTS.message())))
+                .<Result<CommandError, NonEmptyList<AccountEvent>>>map(account -> Result.failure(new CreateAccountError.AccountAlreadyExists()))
                 .orElseGet(() -> {
                     if (command.name == null || command.name.trim().isEmpty()) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, CreateAccountError.ACCOUNT_NAME_NOT_SET.message()));
+                        return Result.failure(new CreateAccountError.AccountNameNotSet());
                     } else if (command.openingBalance < 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, CreateAccountError.OPENING_BALANCE_LESS_THAN_ZERO.message()));
+                        return Result.failure(new CreateAccountError.OpeningBalanceLessThanZero());
                     } else {
                         return Result.success(NonEmptyList.of(new AccountEvent.AccountCreated(command.name, command.openingBalance, Instant.now())));
                     }
@@ -47,25 +47,25 @@ public final class AccountCommandHandler implements CommandHandler<String, Accou
         return currentAggregate
                 .<Result<CommandError, NonEmptyList<AccountEvent>>>map(account -> {
                     if (command.amount <= 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Amount must be greater than 0"));
+                        return Result.failure(new CommandError.CommandHandlerFailed("Amount must be greater than 0"));
                     } else {
                         return Result.success(NonEmptyList.of(new AccountEvent.Deposited(command.amount, Instant.now())));
                     }
                 })
-                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Account does not exist")));
+                .orElse(Result.failure(new CommandError.CommandHandlerFailed("Account does not exist")));
     }
 
     public static Result<CommandError, NonEmptyList<AccountEvent>> withdrawHandler(Optional<Account> currentAggregate, AccountCommand.Withdraw command) {
         return currentAggregate
                 .<Result<CommandError, NonEmptyList<AccountEvent>>>map(account -> {
                     if (command.amount <= 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Amount must be greater than 0"));
+                        return Result.failure(new CommandError.CommandHandlerFailed("Amount must be greater than 0"));
                     } else if (account.balance() - command.amount < 0) {
-                        return Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Insufficient funds"));
+                        return Result.failure(new CommandError.CommandHandlerFailed("Insufficient funds"));
                     } else {
                         return Result.success(NonEmptyList.of(new AccountEvent.Withdrawn(command.amount, Instant.now())));
                     }
                 })
-                .orElse(Result.failure(CommandError.of(CommandError.Reason.CommandHandlerFailed, "Account does not exist")));
+                .orElse(Result.failure(new CommandError.CommandHandlerFailed("Account does not exist")));
     }
 }

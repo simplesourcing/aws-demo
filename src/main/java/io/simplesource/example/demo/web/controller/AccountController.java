@@ -43,7 +43,7 @@ public class AccountController {
             .map(error -> {
                 Map<String, Object> model = new HashMap<>();
                 model.put("form", form);
-                model.put("errors", new String[] { error.message() });
+                model.put("errors", new String[] { error.getMessage() });
                 return new ModelAndView("account_create", model);
              })
              .orElseGet(() -> new ModelAndView("redirect:/account/create/success", Collections.emptyMap()));

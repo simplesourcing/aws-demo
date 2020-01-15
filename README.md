@@ -48,6 +48,31 @@ Start docker-compose:
 docker-compose up
 ```
 
+Create the Elasticsearch indexes:
+```
+curl -X PUT "localhost:9200/simplesourcedemo_account_transaction?pretty" -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "properties": {
+      "account": { "type":  "keyword" },
+      "ammount": { "type":  "double" }
+    }
+  }
+}
+'
+
+curl -X PUT "localhost:9200/simplesourcedemo_account_summary?pretty" -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "properties": {
+      "accountName": { "type":  "keyword" },
+      "balance": { "type":  "double" }
+    }
+  }
+}
+'
+```
+
 Export the below environment variables:
 
 ```

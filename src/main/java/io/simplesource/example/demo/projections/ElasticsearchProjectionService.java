@@ -57,7 +57,7 @@ public class ElasticsearchProjectionService {
         public EventLogConsummer(Config config) {
             kafkaProps = new Properties();
             kafkaProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.kafkaBootstrapServers);
-            kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, config.kafkaGropId + "projection-service");
+            kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, config.kafkaGroupId + "projection-service");
             kafkaProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             kafkaProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
             kafkaProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
